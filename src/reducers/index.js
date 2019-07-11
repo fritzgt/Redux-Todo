@@ -1,19 +1,24 @@
-import { NEW_TODO, TOGGLE_COMPLETE, DELETE_ITEM } from "../actions";
+import {
+  NEW_TODO,
+  TOGGLE_COMPLETE,
+  DELETE_ITEM,
+  EDIT_ITEM,
+  UPDATE_TODO
+} from "../actions";
+import { id } from "postcss-selector-parser";
 
 //creating initial state
 const initialState = {
   todos: [
     {
       value: "Walk the dog",
-      completed: false
+      completed: false,
+      edit: false
     },
     {
       value: "Go to the GYM",
-      completed: true
-    },
-    {
-      value: "Buy milk",
-      completed: false
+      completed: true,
+      edit: true
     }
   ]
 };
@@ -30,7 +35,8 @@ function reducer(state = initialState, action) {
           {
             //Create a new item in the array
             value: action.payload,
-            completed: false
+            completed: false,
+            edit: false
           }
         ]
       });
@@ -59,6 +65,35 @@ function reducer(state = initialState, action) {
           }
           //Returning null to avoid error in the console since func expects return
           return null;
+        })
+      });
+    case EDIT_ITEM:
+      return Object.assign({}, state, {
+        todos: state.todos.map((todo, index) => {
+          //This match item with the toggle item
+          if (index === action.payload) {
+            return Object.assign({}, todo, {
+              edit: !todo.edit
+            });
+          }
+          //   console.log("clicked:", action.payload)
+          //This will return the original array minus the toggle item
+          return todo;
+        })
+      });
+    case UPDATE_TODO:
+      return Object.assign({}, state, {
+        todos: state.todos.map((todo, index) => {
+          //This match item with the toggle item
+          if (index === action.index) {
+            return Object.assign({}, todo, {
+              value: action.payload,
+              edit: false
+            });
+          }
+          //   console.log("clicked:", action.payload)
+          //This will return the original array minus the toggle item
+          return todo;
         })
       });
     default:

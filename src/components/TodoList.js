@@ -4,9 +4,57 @@ import React from "react";
 import { connect } from "react-redux";
 
 //import action toggleComplete
-import { toggleComplete, deleteItem } from "../actions";
+import { toggleComplete, deleteItem, editItem, updateTodo } from "../actions";
 
 class TodoList extends React.Component {
+  state = {
+    newValue: ""
+  };
+
+  //handleling changes
+  changeHandler = e => {
+    console.log(e);
+    this.setState({ [e.target.name]: e.target.value });
+  };
+
+  //Submit changes
+  // submitHandler = e => {
+  //   e.preventDefault();
+  //   // console.log("Update value:", this.state.newValue);
+  //   this.props.updateTodo(this.state.newValue);
+  // };
+
+  //function returns the input
+  returnEditView = (item, index) => {
+    return (
+      <form
+        onSubmit={e => {
+          e.preventDefault();
+          // console.log("Update value:", this.state.newValue);
+          this.props.updateTodo(this.state.newValue, index);
+        }}
+      >
+        <input
+          name="newValue"
+          type="text"
+          defaultValue={item.value}
+          onChange={this.changeHandler}
+          required
+        />
+      </form>
+    );
+  };
+
+  returnDefaultView = item => {
+    return (
+      <h2 /* toggle class */
+        className={`${item.completed ? " completed" : ""}`}
+      >
+        {item.value}
+      </h2>
+    );
+  };
+
   render() {
     return (
       <div className="container">
@@ -24,12 +72,31 @@ class TodoList extends React.Component {
                   this.props.toggleComplete(index);
                 }}
               />
-              <h2 /* toggle class */
-                className={`${item.completed ? " completed" : ""}`}
-              >
-                {item.value}
-              </h2>
+              {/* this will display the todo or an input to edit the todo base on the conditions  */}
+              {item.edit
+                ? this.returnEditView(item, index)
+                : this.returnDefaultView(item)}
             </div>
+            {item.edit ? (
+              <span>
+                <i
+                  className="fas fa-edit"
+                  onClick={() => {
+                    this.props.editItem(index);
+                    this.props.updateTodo(this.state.newValue, index);
+                  }}
+                />
+              </span>
+            ) : (
+              <span>
+                <i
+                  className="fas fa-edit"
+                  onClick={() => {
+                    this.props.editItem(index);
+                  }}
+                />
+              </span>
+            )}
             <span>
               <i
                 className="fas fa-trash-alt"
@@ -57,5 +124,5 @@ const mapStateToProps = state => {
 
 export default connect(
   mapStateToProps,
-  { toggleComplete, deleteItem }
+  { toggleComplete, deleteItem, editItem, updateTodo }
 )(TodoList);
